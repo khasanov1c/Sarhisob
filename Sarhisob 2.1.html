@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sarhisob">
+<meta name="theme-color" content="#000000">
+<title>Sarhisob</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#000;color:#fff;font-family:-apple-system,"SF Pro Text",system-ui,sans-serif;overflow:hidden}
+button,input,textarea{font-family:inherit}
+#app{position:fixed;top:0;left:0;width:100%;height:100%}
+.view{position:absolute;inset:0;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+.hidden{display:none!important}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px}
+.round{width:44px;height:44px;border-radius:50%;background:#1c1c1e;border:0;color:#fff;display:grid;place-items:center;font-size:20px;flex:none}
+.round:active{background:#2c2c2e}
+h1{font-size:34px;margin:6px 16px 10px}
+.ttl{font-size:19px;font-weight:700;text-align:center;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px 24px}
+.group{background:#1c1c1e;border-radius:20px;overflow:hidden}
+.item{padding:14px 18px;border-bottom:1px solid #2c2c2e}
+.item:last-child{border:0}
+.item:active{background:#2c2c2e}
+.nm{font-size:18px;font-weight:600}
+.sub{color:#8e8e93;font-size:14px;margin-top:2px}
+.empty{color:#8e8e93;text-align:center;margin:60px 24px;line-height:1.5}
+.fab{position:absolute;right:20px;bottom:calc(env(safe-area-inset-bottom) + 20px);width:60px;height:60px;border-radius:50%;background:#ff9f0a;border:0;display:grid;place-items:center}
+.fab:active{filter:brightness(1.2)}
+.panel{background:#1c1c1e;border-radius:20px;margin:6px 0 8px;overflow:hidden}
+.ph{width:100%;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:none;border:0;color:#fff;font-size:17px;font-weight:600}
+.ph svg{transition:transform .2s}
+.panel.closed .ph svg{transform:rotate(-90deg)}
+.panel.closed .pb,.panel.closed .sbtn{display:none}
+.phr{display:flex;align-items:center;gap:14px}
+.sbtn{width:34px;height:34px;border-radius:50%;border:0;background:#2c2c2e;color:#fff;display:grid;place-items:center;padding:0}
+.sbtn.on{background:#ff9f0a;color:#000}
+.srch{padding:12px 14px;border-top:1px solid #2c2c2e}
+.srch input{width:100%;height:40px;border:0;border-radius:12px;background:#2c2c2e;color:#fff;font-size:16px;padding:0 14px;outline:0}
+.sres{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 4px 0}
+.sres .k{color:#8e8e93;font-size:15px}
+.sres .k small{display:block;font-size:12px;margin-top:1px}
+.sres .v{font-size:19px;font-weight:600;color:#ff9f0a;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pr{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 18px;border-top:1px solid #2c2c2e}
+.pr .k{color:#8e8e93;font-size:15px}
+.pr .k small{display:block;font-size:12px;margin-top:1px}
+.pr .v{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pr.big .v{color:#ff9f0a}
+.dh{display:flex;justify-content:space-between;align-items:baseline;margin:18px 4px 6px}
+.dd{font-weight:700;font-size:17px}
+.dd small{color:#8e8e93;font-weight:400;font-size:13px;margin-left:6px}
+.dt{font-weight:700;font-size:17px;color:#ff453a;font-variant-numeric:tabular-nums}
+.dh{cursor:pointer;-webkit-user-select:none;user-select:none}
+.dr{display:flex;align-items:center;gap:10px}
+.dh svg{flex:none;transition:transform .2s}
+.dh.closed svg{transform:rotate(-90deg)}
+.rows{background:#1c1c1e;border-radius:16px;overflow:hidden}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid #2c2c2e}
+.row:last-child{border:0}
+.row:active{background:#2c2c2e}
+.tx{font-size:17px;word-break:break-word}
+.tm{color:#8e8e93;font-size:12px;margin-top:1px}
+.am{color:#ff453a;font-size:17px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.composer{display:flex;gap:8px;align-items:center;padding:8px 12px calc(env(safe-area-inset-bottom) + 8px);background:#000}
+.composer input[type=text]{flex:1;min-width:0;height:44px;border:0;border-radius:22px;background:#1c1c1e;color:#fff;font-size:17px;padding:0 16px;outline:0}
+.composer input.bad{outline:2px solid #ff453a}
+.chip{position:relative;flex:none;height:44px;padding:0 14px;border-radius:22px;background:#1c1c1e;color:#ff9f0a;font-size:15px;display:flex;align-items:center}
+.chip input{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px}
+.send{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:#ff9f0a;display:grid;place-items:center}
+.sheet{position:fixed;inset:0;display:none;z-index:9}
+.sheet.on{display:flex;align-items:flex-end}
+.sheet .back{position:absolute;inset:0;background:rgba(0,0,0,.6)}
+.sheet .card{position:relative;width:100%;background:#1c1c1e;border-radius:24px 24px 0 0;padding:20px 16px calc(env(safe-area-inset-bottom) + 20px);display:flex;flex-direction:column;gap:12px}
+.card h2{margin:0 0 4px;font-size:20px}
+.card input,.card textarea{width:100%;border:0;border-radius:12px;background:#2c2c2e;color:#fff;font-size:17px;padding:12px 14px;outline:0}
+.card textarea{height:120px;font-size:13px;resize:none}
+.card button{height:48px;border:0;border-radius:14px;font-size:17px;font-weight:600;background:#2c2c2e;color:#fff}
+.card button.primary{background:#ff9f0a;color:#000}
+.card button.danger{color:#ff453a}
+.note{color:#8e8e93;font-size:13px;line-height:1.4;margin:0}
+</style>
+</head>
+<body>
+<div id="app">
+  <section id="home" class="view">
+    <div class="bar"><span></span><button class="round" id="backupBtn" aria-label="Zaxira">⋯</button></div>
+    <h1>Sarhisob</h1>
+    <div class="scroll" id="homeList"></div>
+    <button class="fab" id="newBtn" aria-label="Yangi oy">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><path d="M18.4 2.6a2 2 0 0 1 2.8 2.8L12 14.6l-4 1 1-4z"/></svg>
+    </button>
+  </section>
+
+  <section id="month" class="view hidden">
+    <div class="bar">
+      <button class="round" id="back" aria-label="Orqaga"><svg width="12" height="20" viewBox="0 0 12 20"><path d="M10 2L2 10l8 8" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="ttl" id="mTitle"></div>
+      <button class="round" id="more" aria-label="Menyu">⋯</button>
+    </div>
+    <div class="scroll" id="mScroll">
+      <div class="panel" id="panel">
+        <div class="ph" id="panelHead"><span>Hisob-kitob</span><span class="phr"><button class="sbtn" id="srchBtn" type="button" aria-label="Qidirish"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+          <svg width="16" height="10" viewBox="0 0 16 10"><path d="M2 2l6 6 6-6" fill="none" stroke="#8e8e93" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span></div>
+        <div class="pb"><div class="srch hidden" id="srch"><input type="text" id="sq" placeholder="Nima boʻyicha? masalan: yoʻl" autocapitalize="none" autocomplete="off"><div class="sres" id="sres"></div></div><div id="panelBody"></div></div>
+      </div>
+      <div id="entries"></div>
+    </div>
+    <form class="composer" id="composer" autocomplete="off">
+      <label class="chip"><span id="chipTxt"></span><input type="date" id="dateIn"></label>
+      <input type="text" id="txt" placeholder="20 yoʻl" enterkeyhint="send" autocapitalize="none">
+      <button class="send" type="submit" aria-label="Qoʻshish"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 16V4M4 9l6-6 6 6" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </form>
+  </section>
+</div>
+<div class="sheet" id="sheet"><div class="back" id="sheetBack"></div><div class="card" id="sheetBody"></div></div>
+
+<script>
+const MONTHS=["Yanvar","Fevral","Mart","Aprel","May","Iyun","Iyul","Avgust","Sentabr","Oktyabr","Noyabr","Dekabr"];
+const DAYS=["Yakshanba","Dushanba","Seshanba","Chorshanba","Payshanba","Juma","Shanba"];
+const KEY="xarajat-db",PKEY="xarajat-panel";
+let db={months:[]};
+try{db=JSON.parse(localStorage.getItem(KEY))||db}catch(e){}
+if(!db.months)db.months=[];
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}};
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const money=n=>Math.round(Math.abs(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g,"\u00a0");
+const neg=n=>Math.round(n)?"−"+money(n):"0";
+const p2=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate());
+const dmy=d=>p2(d.getDate())+"."+p2(d.getMonth()+1)+"."+String(d.getFullYear()).slice(2);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const getM=()=>db.months.find(m=>m.id===cur);
+const monthName=ym=>{const [y,m]=ym.split("-").map(Number);return MONTHS[m-1]+(y!==new Date().getFullYear()?" "+y:"")};
+let cur=null,selDate="";
+
+//PARSE{
+function parse(raw){
+  let s=raw.trim().replace(/^([-−–+]?\s*\d{1,3})((?:\s\d{3})+)(?!\d)/,(m,a,b)=>a+b.replace(/\s/g,""));
+  const m=s.match(/^[-−–+]?\s*(\d+(?:[.,]\d+)?)\s*(k|к|ming)?(?![\p{L}\d])\s*(.*)$/iu);
+  if(!m)return null;
+  const n=parseFloat(m[1].replace(",","."));
+  const amt=Math.round(m[2]?n*1000:(n<1000?n*1000:n));
+  if(!(amt>0))return null;
+  return{amt,txt:m[3].trim()||"Xarajat"};
+}
+//}PARSE
+
+function stats(m){
+  const [y,mo]=m.ym.split("-").map(Number);
+  const dim=new Date(y,mo,0).getDate(),now=new Date();
+  const total=m.entries.reduce((a,e)=>a+e.amt,0);
+  const state=now<new Date(y,mo-1,1)?"future":now>new Date(y,mo-1,dim,23,59,59)?"past":"now";
+  const dn=m.entries.map(e=>new Date(e.ts).getDate()),f=dn.length?Math.min(...dn):0,l=dn.length?Math.max(...dn):0;
+  const end=state=="now"?Math.max(now.getDate(),l):state=="past"?dim:l;
+  const el=dn.length?Math.max(1,end-f+1):0;
+  const avg=el?total/el:0;
+  const proj=state=="now"?avg*dim:total;
+  const tk=ymd(now);
+  const today=state=="now"?m.entries.filter(e=>ymd(new Date(e.ts))==tk).reduce((a,e)=>a+e.amt,0):null;
+  return{y,mo,dim,total,avg,proj,today,state,el,f};
+}
+function defDate(m){
+  const s=stats(m),d=String(s.dim);
+  if(s.state=="now")return ymd(new Date());
+  return s.state=="future"?`${s.y}-${p2(s.mo)}-01`:`${s.y}-${p2(s.mo)}-${p2(s.dim)}`;
+}
+function setDate(v){
+  selDate=v;const [y,m,d]=v.split("-");$("chipTxt").textContent=d+"."+m;
+}
+
+function renderHome(){
+  const ms=[...db.months].sort((a,b)=>b.ym.localeCompare(a.ym));
+  $("homeList").innerHTML=ms.length
+    ?'<div class="group">'+ms.map(m=>`<div class="item" data-id="${m.id}"><div class="nm">${esc(m.name)}</div><div class="sub">${neg(stats(m).total)} · ${m.entries.length} ta yozuv</div></div>`).join("")+"</div>"
+    :'<p class="empty">Hali oy yoʻq.<br>Pastdagi ✏️ tugmasi bilan yangi oy yarating.</p>';
+}
+function renderMonth(){
+  const m=getM();if(!m)return;
+  $("mTitle").textContent=m.name;
+  const s=stats(m);
+  const rows=[
+    ["Oy boshidan jami",neg(s.total),""],
+    ["Oʻrtacha kunlik",s.el?neg(s.avg):"—",s.el?`${s.f}-sanadan ${s.el} kun`:""],
+    ["Bugungi",s.today===null?"—":neg(s.today),""],
+    [s.state=="past"?"Oy yakuni":"Oy oxirigacha taxmin",s.state=="future"?"—":neg(s.proj),s.state=="now"?`oʻrtacha × ${s.dim} kun`:""]
+  ];
+  $("panelBody").innerHTML=rows.map((r,i)=>`<div class="pr${i==3?" big":""}"><div class="k">${r[0]}${r[2]?`<small>${r[2]}</small>`:""}</div><div class="v">${r[1]}</div></div>`).join("");
+  const es=[...m.entries].sort((a,b)=>a.ts-b.ts),days=[];
+  es.forEach(e=>{const k=ymd(new Date(e.ts));let g=days[days.length-1];if(!g||g.k!=k){g={k,t:e.ts,sum:0,list:[]};days.push(g)}g.sum+=e.amt;g.list.push(e)});
+  $("entries").innerHTML=days.length?days.map(g=>{
+    const d=new Date(g.t),op=m.open&&g.k in m.open?m.open[g.k]:g.k==ymd(new Date());
+    return `<div class="dh${op?"":" closed"}" data-k="${g.k}"><span class="dd">${dmy(d)}<small>${DAYS[d.getDay()]} · ${g.list.length} ta</small></span><span class="dr"><span class="dt">${neg(g.sum)}</span><svg width="14" height="9" viewBox="0 0 16 10"><path d="M2 2l6 6 6-6" fill="none" stroke="#8e8e93" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="rows${op?"":" hidden"}">`+
+      g.list.map(e=>{const t=new Date(e.ts);return `<div class="row" data-id="${e.id}"><div><div class="tx">${esc(e.txt)}</div><div class="tm">${p2(t.getHours())}:${p2(t.getMinutes())}</div></div><div class="am">${neg(e.amt)}</div></div>`}).join("")+"</div>";
+  }).join(""):'<p class="empty">Hali xarajat yoʻq.<br>Pastga yozing, masalan: <b>20 yoʻl</b></p>';
+  renderSearch();
+}
+const norm=t=>t.toLowerCase().replace(/[ʻʼ’‘'`´]/g,"");
+function renderSearch(){
+  const m=getM();if(!m||$("srch").classList.contains("hidden"))return;
+  const raw=$("sq").value.trim(),q=norm(raw);
+  if(!q){$("sres").innerHTML='<span class="k">Soʻz yozing, masalan: yoʻl</span>';return}
+  const hit=m.entries.filter(e=>norm(e.txt).includes(q));
+  const sum=hit.reduce((a,e)=>a+e.amt,0),days=new Set(hit.map(e=>ymd(new Date(e.ts)))).size;
+  $("sres").innerHTML=hit.length?`<span class="k">${esc(raw)}<small>${hit.length} ta yozuv · ${days} kun</small></span><span class="v">${neg(sum)}</span>`:'<span class="k">Topilmadi</span>';
+}
+const toBottom=()=>{const s=$("mScroll");s.scrollTop=s.scrollHeight};
+
+function openMonth(id){
+  cur=id;const m=getM();
+  $("home").classList.add("hidden");$("month").classList.remove("hidden");
+  $("panel").classList.toggle("closed",localStorage.getItem(PKEY)==="0");
+  $("srch").classList.add("hidden");$("sq").value="";$("srchBtn").classList.remove("on");
+  const dI=$("dateIn"),s=stats(m);
+  dI.min=`${s.y}-${p2(s.mo)}-01`;dI.max=`${s.y}-${p2(s.mo)}-${p2(s.dim)}`;
+  setDate(defDate(m));dI.value=selDate;
+  renderMonth();toBottom();
+}
+function goHome(){cur=null;$("month").classList.add("hidden");$("home").classList.remove("hidden");renderHome()}
+
+function sheet(html,after){$("sheetBody").innerHTML=html;$("sheet").classList.add("on");after&&after()}
+const closeSheet=()=>$("sheet").classList.remove("on");
+$("sheetBack").onclick=closeSheet;
+
+function ask(msg,yes,label){
+  sheet(`<h2>${esc(msg)}</h2><button class="danger" id="aYes">${label||"Oʻchirish"}</button><button id="aNo">Bekor qilish</button>`,()=>{$("aYes").onclick=()=>{closeSheet();yes()};$("aNo").onclick=closeSheet});
+}
+function askText(title,val,ok){
+  sheet(`<h2>${title}</h2><input id="aIn" maxlength="30" value="${esc(val)}"><button class="primary" id="aOk">Saqlash</button>`,()=>{$("aOk").onclick=()=>{const v=$("aIn").value.trim();if(v){closeSheet();ok(v)}}});
+}
+function newSheet(){
+  const n=new Date(),ym=n.getFullYear()+"-"+p2(n.getMonth()+1);
+  sheet(`<h2>Yangi oy</h2><input id="nName" maxlength="30" value="${monthName(ym)}"><input id="nYm" type="month" value="${ym}"><button class="primary" id="nOk">Yaratish</button>`,()=>{
+    let edited=false;
+    $("nName").oninput=()=>edited=true;
+    $("nYm").onchange=()=>{const v=$("nYm").value;if(v&&!edited)$("nName").value=monthName(v)};
+    $("nOk").onclick=()=>{
+      const v=$("nYm").value||ym;
+      const m={id:uid(),name:$("nName").value.trim()||monthName(v),ym:v,entries:[]};
+      db.months.push(m);save();closeSheet();openMonth(m.id);
+    };
+  });
+}
+function moreSheet(){
+  sheet(`<button id="mRen">Nomini oʻzgartirish</button><button class="danger" id="mDel">Oyni oʻchirish</button>`,()=>{
+    $("mRen").onclick=()=>{const m=getM();askText("Yangi nom",m.name,v=>{m.name=v;save();renderMonth()})};
+    $("mDel").onclick=()=>{const m=getM();ask(`"${m.name}" va undagi ${m.entries.length} ta yozuv oʻchirilsinmi?`,()=>{db.months=db.months.filter(x=>x.id!==m.id);save();goHome()})};
+  });
+}
+function backupSheet(){
+  sheet(`<h2>Zaxira nusxa</h2><p class="note">Ma’lumotlar faqat shu telefonda saqlanadi. Vaqti-vaqti bilan nusxa olib, Notes’ga qo‘yib qo‘ying.</p><textarea id="bk" spellcheck="false"></textarea><button class="primary" id="bkCopy">Nusxalash</button><button id="bkRestore">Shu matndan tiklash</button>`,()=>{
+    $("bk").value=JSON.stringify(db);
+    $("bkCopy").onclick=async()=>{try{await navigator.clipboard.writeText($("bk").value);$("bkCopy").textContent="Nusxalandi ✓"}catch(e){$("bk").select()}};
+    $("bkRestore").onclick=()=>{
+      try{const d=JSON.parse($("bk").value);if(!d||!Array.isArray(d.months))throw 0;
+        ask("Hozirgi ma’lumotlar almashtiriladi. Davom etilsinmi?",()=>{db=d;save();renderHome()},"Tiklash");
+      }catch(e){$("bkRestore").textContent="Matn noto‘g‘ri"}
+    };
+  });
+}
+
+$("homeList").addEventListener("click",e=>{const it=e.target.closest(".item");if(it)openMonth(it.dataset.id)});
+$("newBtn").onclick=newSheet;
+$("backupBtn").onclick=backupSheet;
+$("back").onclick=goHome;
+$("more").onclick=moreSheet;
+$("panelHead").onclick=e=>{if(e.target.closest("#srchBtn"))return;const c=$("panel").classList.toggle("closed");try{localStorage.setItem(PKEY,c?"0":"1")}catch(_){}};
+$("srchBtn").onclick=()=>{const s=$("srch"),show=s.classList.contains("hidden");s.classList.toggle("hidden",!show);$("srchBtn").classList.toggle("on",show);if(show){renderSearch();$("sq").focus()}else $("sq").value=""};
+$("sq").addEventListener("input",renderSearch);
+$("dateIn").onchange=e=>{if(e.target.value)setDate(e.target.value)};
+$("entries").addEventListener("click",e=>{
+  const h=e.target.closest(".dh");if(!h)return;
+  const m=getM(),c=h.classList.toggle("closed");h.nextElementSibling.classList.toggle("hidden",c);
+  (m.open=m.open||{})[h.dataset.k]=!c;save();
+});
+$("entries").addEventListener("click",e=>{
+  const r=e.target.closest(".row");if(!r)return;
+  const m=getM(),en=m.entries.find(x=>x.id===r.dataset.id);
+  if(en)ask(`${en.txt} (${neg(en.amt)}) oʻchirilsinmi?`,()=>{m.entries=m.entries.filter(x=>x.id!==en.id);save();renderMonth()});
+});
+$("composer").addEventListener("submit",e=>{
+  e.preventDefault();
+  const m=getM(),inp=$("txt"),r=parse(inp.value);
+  if(!r){inp.classList.add("bad");setTimeout(()=>inp.classList.remove("bad"),700);return}
+  const [y,mo,d]=selDate.split("-").map(Number),n=new Date();
+  m.entries.push({id:uid(),ts:new Date(y,mo-1,d,n.getHours(),n.getMinutes(),n.getSeconds()).getTime(),amt:r.amt,txt:r.txt});
+  (m.open=m.open||{})[selDate]=true;save();inp.value="";renderMonth();toBottom();inp.focus();
+});
+
+function fit(){
+  const v=window.visualViewport;
+  $("app").style.height=(v?v.height:innerHeight)+"px";
+  window.scrollTo(0,0);
+}
+if(window.visualViewport){visualViewport.addEventListener("resize",fit);visualViewport.addEventListener("scroll",fit)}
+addEventListener("resize",fit);fit();
+if(!db.months.length){
+  const n=new Date(),ym=n.getFullYear()+"-"+p2(n.getMonth()+1),L=[["yoʻl",12500],["qorn",20000],["choy",7000],["dori",18000],["tushlik",35000],["taksi",15000],["kitob",60000]];
+  const es=[];let k=3;
+  for(let d=1;d<=n.getDate();d++){const c=2+(d%3);for(let i=0;i<c;i++){const x=L[(d*3+i*2+k++)%L.length];es.push({id:uid()+d+i,ts:new Date(n.getFullYear(),n.getMonth(),d,8+i*4,(d*7+i*11)%60).getTime(),amt:x[1],txt:x[0]})}}
+  db.months.push({id:uid(),name:monthName(ym),ym,entries:es});
+}
+renderHome();
+</script>
+</body>
+</html>
